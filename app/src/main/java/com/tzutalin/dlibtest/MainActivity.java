@@ -291,7 +291,6 @@ public class MainActivity extends AppCompatActivity {
                 featureMat.add(tempVec);
             }
         }
-
         return featureMat;
     }
 
