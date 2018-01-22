@@ -1,15 +1,83 @@
-# face-recognition
+# 人脸识别
+这是一个具有人脸识别和人脸聚类功能的安卓应用。原计划是做一个根据人脸分类的智能相册，目前已搁置。
 
-This is a smart album app for face recognition by using the dlib library. Currently it only has simple face recognition and face clustering capabilities.
+## 介绍
+ 在使用之前，我想先介绍一下应用的运行机制，这应该对你使用或者修改程序有所帮助。
 
-### Future tasks
-1. Performance optimization</br>
-   Which include 
-   * reduce processing time  
-   * improve predictive performance
-2. Complete the display layout</br>
+ ### 人脸识别和聚类原理
+ * 人脸识别 残差神经网络
+ * 聚类 层次聚类算法
 
-----
+### 程序的结构
+在底层使用了dlib编译的so文件，通过jni支持java调用底层方法。
+* dlib版本已同步到19.8
+* NDK使用的是R15版本
 
-### Assist wanted
-Anyone who wants to help is welcome.
+应用层，首先有一张表格记录了图片的名称，位置，人脸标识和特征点。
+在启动程序后先判断相册中图片是否有变化，是则重新同步图片和表格数据，否则加载人脸标识和特征点数据，然后进入人脸聚类。</br>
+
+
+### 准确率和效率
+* 对于人脸识别环节，在假设人脸检测正确率100%的情况下，正确率是0.97，召回率是0.96。
+* 性能方面与测试硬件有非常大的关系，使用骁龙652的手机测试时，优化后人脸检测平均耗时0.5s,而特征点计算在2s左右。但是在使用骁龙616时，人脸检测平均1s, 特征点平均6s左右。关于性能差异的原因请参考<其它>。
+
+## 如何使用
+由于我最近很忙，并且不擅长android编程(特别是UI)，所以没有对UI代码
+进行修改，即实际效果目前无法在应用上得到展现，但是你依旧可以通过消息日志得到反馈。</br>
+首先，你需要清空你的相册，最好是手机中的所有图片。</br>
+然后，导入你想要测试的人脸图像，注意，图像必须包括人脸，并且人脸不能太小。</br>
+最后运行程序，等待一段时间，你将在Android Studio的log中看到如下类似信息：
+>I/verification.h:80 load_face_landmark from : /storage/emulated/0/shape_predictor_68_face_landmarks.dat
+I/verification.h:86 load_face_verify from : /storage/emulated/0/dlib_face_recognition_resnet_model_v1.dat
+I/jni_face_ver.cpp:135 jniVerify
+I/verification.h:107 verify image_path/storage/emulated/0/DCIM/Camera/lyj_6.jpg
+I/verification.h:117 image size:1280 960
+I/verification.h:132 time test: detect start.
+I/verification.h:134 Dlib HOG face det size : 1
+I/verification.h:147 Dlib face_descriptors size : 1
+I/verification.h:148 Dlib face_descriptors[0].nr : 128  Dlib face_descriptors[0].nc: 1
+I/jni_face_ver.cpp:93 getVerifyResult in
+I/jni_face_ver.cpp:135 jniVerify
+I/verification.h:107 verify image_path/storage/emulated/0/DCIM/Camera/lyj_5.jpg
+I/verification.h:117 image size:1280 1280
+I/verification.h:132 time test: detect start.
+I/verification.h:134 Dlib HOG face det size : 1
+I/verification.h:147 Dlib face_descriptors size : 1
+
+`......`
+
+> insert image vec tempVec = /storage/emulated/0/DCIM/Camera/lyj_6.jpg
+imageVecText:-0.024751978,0.024874505,-0.013718821,-0.028619522,-0.09627778,-0.0052718264,-0.09067893,-0.04976383,0.06042842,-0.13504581,0.14587808,-0.097083785,-0.17904182,-0.079852544,-0.033664394,0.19204171,-0.15419398,-0.18213901,-0.022971295,-0.046877004,0.015238022,0.008480772,-0.0069706016,0.02609567,-0.15924351,-0.33667544,-0.0842147,-0.09047962,0.0028145332,-0.07761911,-0.05197698,0.12094144,-0.08431834,0.066665806,0.09168729,0.060553893,0.03974204,-0.043633655,0.23516662,0.023121234,-0.24345173,-0.019863492,0.12237895,0.24899954,0.18819396,8.997456E-4,-0.0076567214,-0.09647579,0.182668,-0.1509597,0.0085309595,0.20168272,0.050060004,0.095187746,0.017229209,-0.04954455,0.075121254,0.12472357,-0.10816748,-0.004579893,0.03797207,-0.03161928,-0.008323679,-0.057388052,0.22502124,0.025031103,-0.10274051,-0.18190168,0.14093028,-0.17409733,-0.12056996,0.024919994,-0.16519178,-0.16235322,-0.24118903,-0.015565047,0.33244506,0.14860749,-0.17130354,0.13421851,0.02611238,-0.09063421,0.14841715,0.17515385,-0.06889065,0.017389476,-0.032926377,-0.0070704296,0.29050073,-0.04428906,0.020326203,0.17312077,-0.008399133,0.11601181,0.04945643,-0.01870037,-0.062723845,0.0273058,-0.1307312,-0.030138377,0.029176394,-0.069304466,0.011285176,0.14039525,-0.16073291,0.14106114,-0.0067199203,0.044936907,0.027418818,0.09416451,-0.06430113,-0.084608324,0.115929455,-0.16218446,0.14299646,0.15306793,0.1023902,0.0600553,0.15778205,0.10151707,0.0031617861,-0.009695006,-0.1983394,-0.011435228,0.09858083,-0.04802562,0.021209128,-0.006057208,
+
+> group: 0
+D/dlib: /storage/emulated/0/DCIM/Camera/lyj_6.jpg
+D/dlib: /storage/emulated/0/DCIM/Camera/lyj_3.jpg
+D/dlib: /storage/emulated/0/DCIM/Camera/lyj_0.jpg
+group: 3
+D/dlib: /storage/emulated/0/DCIM/Camera/lyj_2.jpg
+D/dlib: /storage/emulated/0/DCIM/Camera/lyj_1.jpg
+
+`......`
+
+---
+## 需要帮助
+
+### 目前的问题
+最重要的问题或需求：
+* 性能 
+* 界面 
+
+其他问题：
+* 非人脸图片没有做处理，会报错。
+* 没有处理单张图片多个人脸，目前只读取第一个人脸。
+* 数据在android上储存的问题，使用表格的方式需要类型转换耗费时间并且占用较大内存空间。
+* 冗余代码没有清理。
+
+## 其他
+参考
+* [dlib](https://github.com/davisking/dlib)
+* [dlib_android](https://github.com/tzutalin/dlib-android)
+
+性能
+* 在支持neon的平台上运行速度会更快。
+* 缩小图片只能缩短人脸检测的时间，而人脸识别不会发生变化。
