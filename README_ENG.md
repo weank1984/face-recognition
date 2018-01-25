@@ -1,33 +1,30 @@
-[English](README_ENG.md)
-# 人脸识别 
-这是一个具有人脸识别和人脸聚类功能的安卓应用。原计划是做一个根据人脸分类的智能相册，目前已搁置。
+# Face verify
+This is an Android application with face recognition and face clustering. The original plan is to develop a smart album based on face classification, now has been shelved.
 
-## 介绍
- 在使用之前，我想先介绍一下应用的运行机制，这应该对你使用或者修改程序有所帮助。
+## Before using
+Before using, I would like to introduce the operating mechanism of the application, which should help you to use or modify the program.
 
- ### 人脸识别和聚类原理
- * 人脸识别 残差神经网络
- * 聚类 层次聚类算法
+### Algorithm
+* Face recognition: Residual Neural Network
+* Clustering: Hierarchical Clustering Algorithm
 
-### 程序的结构
-在底层使用了dlib编译的so文件，通过jni支持java调用底层方法。
-* dlib版本已同步到19.8
-* NDK使用的是R15版本
+### Accuracy and Performance
+* Assuming face detection accuracy is 100%, the correct rate is 0.97, the recall rate is 0.96.
+* Performance have a very large relationship with hardware
 
-应用层，首先有一张表格记录了图片的名称，位置，人脸标识和特征点。
-在启动程序后先判断相册中图片是否有变化，是则重新同步图片和表格数据，否则加载人脸标识和特征点数据，然后进入人脸聚类。</br>
+image size <= 1800x1800
+|  |cpu|face detection|face verify|
+|--|:--:|:--:|:--:|
+|Snapdragon616|1.2GHZ| 2s |6-7s|
+|Snapdragon652|1.8GHZ| 0.5s|1-2s|
 
+ ps: For reasons of performance differences, refer to #Others.
 
-### 准确率和效率
-* 对于人脸识别环节，在假设人脸检测正确率100%的情况下，正确率是0.97，召回率是0.96。
-* 性能方面与测试硬件有非常大的关系，使用骁龙652的手机测试时，优化后人脸检测平均耗时0.5s,而特征点计算在2s左右。但是在使用骁龙616时，人脸检测平均1s, 特征点平均6s左右。关于性能差异的原因请参考<其它>。
-
-## 如何使用
-由于我最近很忙，并且不擅长android编程(特别是UI)，所以没有对UI代码
-进行修改，即实际效果目前无法在应用上得到展现，但是你依旧可以通过消息日志得到反馈。</br>
-首先，你需要清空你的相册，最好是手机中的所有图片。</br>
-然后，导入你想要测试的人脸图像，注意，图像必须包括人脸，并且人脸不能太小。</br>
-最后运行程序，等待一段时间，你将在Android Studio的log中看到如下类似信息：
+## How to use
+As I am very busy lately, and not good at android programming (especially UI), so the actual page is not currently visible on the layout, but you can still get feedback from the message log.</br>
+First, you need to empty your album, preferably all the pictures in your phone. </br>
+Then, import the face image you want to test, note that the image must include the face, and the face can not be too small. </br>
+Finally run the program, wait a while, you will see in the Android Studio log similar to the following information:
 
     I/verification.h:80 load_face_landmark from : /storage/emulated/0/shape_predictor_68_face_landmarks.dat
     I/verification.h:86 load_face_verify from : /storage/emulated/0/dlib_face_recognition_resnet_model_v1.dat
@@ -56,28 +53,25 @@
     group: 3
     D/dlib: /storage/emulated/0/DCIM/Camera/lyj_2.jpg
     D/dlib: /storage/emulated/0/DCIM/Camera/lyj_1.jpg
+    
+## Contributors wanted
 
----
-## 需要帮助
+*The most emergency*
+* Optimize performance
+* Complete UI
 
-### 目前的问题
-最重要的问题或需求：
-* 性能 
-* 界面 
+*And others*
+* Non-face pictures are not processed.
+* Multi-face images are not processed.
+* Redundant code is not cleaned up
 
-其他问题：
-* 非人脸图片没有做处理，会报错。
-* 没有处理单张图片多个人脸，目前只读取第一个人脸。
-* 数据在android上储存的问题，使用表格的方式需要类型转换耗费时间并且占用较大内存空间。
-* 冗余代码没有清理。
+## Others
+*reference*
+1. [dlib](https://github.com/davisking/dlib)
+2. [dlib_android](https://github.com/tzutalin/dlib-android)
 
-## 其他
-参考
-* [dlib](https://github.com/davisking/dlib)
-* [dlib_android](https://github.com/tzutalin/dlib-android)
+About jni and os folder I will update soon.
 
-关于jni的部分，我会在合适的时候开源代码。
-
-性能
-* 在支持neon的平台上运行速度会更快。
-* 缩小图片只能缩短人脸检测的时间，而人脸识别不会发生变化。
+*performance*
+* app will run faster in platform supported NEON.
+* resize image can reduce face decetion time but no help to face verify.
