@@ -13,6 +13,7 @@ Before using, I would like to introduce the operating mechanism of the applicati
 * Performance have a very large relationship with hardware
 
 image size <= 1800x1800
+
 |  |cpu|face detection|face verify|
 |--|:--:|:--:|:--:|
 |Snapdragon616|1.2GHZ| 2s |6-7s|
