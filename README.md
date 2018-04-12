@@ -76,7 +76,7 @@
 * [dlib](https://github.com/davisking/dlib)
 * [dlib_android](https://github.com/tzutalin/dlib-android)
 
-关于jni的部分，我会在合适的时候开源代码。
+jni已更新，[dlib_jni](https://github.com/weank1984/dlib_jni)。
 
 性能
 * 在支持neon的平台上运行速度会更快。
